@@ -71,14 +71,15 @@ npm.cmd run dev
 Run a specific feature:
 
 ```bash
-npm.cmd run test -- --spec cypress/e2e/add-to-cart.feature
-npm.cmd run test -- --spec cypress/e2e/compare-products.feature
-npm.cmd run test -- --spec cypress/e2e/login.feature
+npm.cmd run test:login
+npm.cmd run test:add-to-cart
+npm.cmd run test:compare
 ```
 
 ## Environment Data
 
 Create a `cypress.env.json` file in the project root to store local test credentials.
+Use `cypress.env.example.json` as a template.
 
 Example:
 
