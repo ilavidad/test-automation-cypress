@@ -1,6 +1,20 @@
 # Test Automation Cypress
 
-Automated end-to-end tests for the OpenCart demo site using Cypress and Gherkin.
+End-to-end test automation project for the OpenCart demo site using Cypress and Gherkin.
+
+## Objective
+
+Validate representative user journeys in a public ecommerce demo while keeping the test code readable, maintainable, and easy to extend.
+
+## Selected Flows
+
+- Login: validates that an existing user can sign in successfully.
+- Add To Cart: configures `Canon EOS 5D`, adds it to the cart, and validates the configured product in the cart view.
+- Compare Products: compares `Canon EOS 5D` and `Nikon D300` from the Cameras category.
+
+## Why These Flows
+
+These scenarios cover core ecommerce behavior without requiring admin access or changing the application under test: authentication, product configuration, cart validation, and product comparison.
 
 ## Tech Stack
 
@@ -11,23 +25,7 @@ Automated end-to-end tests for the OpenCart demo site using Cypress and Gherkin.
 
 ## Test Site
 
-Base URL:
-
-```text
-https://opencart.abstracta.us
-```
-
-## Test Scenarios
-
-- Login
-  - Valid user login
-- Add To Cart
-  - Configure Canon EOS 5D with option Blue and quantity 4
-  - Add product to cart
-  - Validate product in cart view
-- Compare Products
-  - Add Canon EOS 5D and Nikon D300 to product comparison
-  - Validate both products in comparison view
+Base URL: `https://opencart.abstracta.us`
 
 ## Project Structure
 
@@ -42,9 +40,18 @@ cypress/
       compare-products.js
       login.js
   support/
-    e2e.js
     commands.js
+    e2e.js
+    test-data.js
 ```
+
+Key responsibilities:
+
+- `*.feature`: business-readable scenarios.
+- `step_definitions/`: glue between Gherkin steps and Cypress actions.
+- `support/commands.js`: reusable Cypress commands for domain actions.
+- `support/test-data.js`: stable demo-site routes, products, categories, and product configuration data.
+- `support/e2e.js`: global Cypress support configuration.
 
 ## Setup
 
@@ -54,34 +61,7 @@ Install dependencies:
 npm install
 ```
 
-## Run Tests
-
-Run all tests in headless mode:
-
-```bash
-npm.cmd run test
-```
-
-Run Cypress in interactive mode:
-
-```bash
-npm.cmd run dev
-```
-
-Run a specific feature:
-
-```bash
-npm.cmd run test:login
-npm.cmd run test:add-to-cart
-npm.cmd run test:compare
-```
-
-## Environment Data
-
-Create a `cypress.env.json` file in the project root to store local test credentials.
-Use `cypress.env.example.json` as a template.
-
-Example:
+Create a `cypress.env.json` file in the project root. Use `cypress.env.example.json` as a template:
 
 ```json
 {
@@ -92,8 +72,39 @@ Example:
 }
 ```
 
-This file is ignored by Git and should not be committed.
+`cypress.env.json` is ignored by Git and should not be committed.
+
+## Run Tests
+
+Run all tests in headless mode:
+
+```bash
+npm.cmd run test
+```
+
+Open Cypress in interactive mode:
+
+```bash
+npm.cmd run dev
+```
+
+Run a specific flow:
+
+```bash
+npm.cmd run test:login
+npm.cmd run test:add-to-cart
+npm.cmd run test:compare
+```
 
 ## Notes
 
-The OpenCart demo site is public and can be unstable. Some tests include small workarounds for demo-site behavior, such as handling a `pagespeed is not defined` application error and normalizing links that point to `http://opencart.abstracta.us:80`.
+The OpenCart demo site is public and can be unstable. The suite includes small workarounds for demo-site behavior, such as ignoring the external `pagespeed is not defined` error and normalizing links that point to `http://opencart.abstracta.us:80`.
+
+Cypress may show an `allowCypressEnv` warning because the Cucumber preprocessor currently relies on `Cypress.env()` internally. The warning does not fail the tests.
+
+## Future Improvements
+
+- Replace public demo credentials with a controlled test user lifecycle if the environment allows it.
+- Add retry-safe setup or cleanup for cart state if more cart scenarios are added.
+- Add reporting for CI execution.
+- Introduce page objects only if flows grow enough to justify another abstraction layer.

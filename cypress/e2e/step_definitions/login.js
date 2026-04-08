@@ -1,15 +1,12 @@
 const { Given, When, Then } = require("@badeball/cypress-cucumber-preprocessor");
+const { routes } = require("../../support/test-data");
 
 Given("the user is on the login page", function () {
-  cy.visit("/index.php?route=account/login");
+  cy.visit(routes.login);
 });
 
 When("the user enters valid credentials", function () {
-  const user = Cypress.env("validUser");
-
-  cy.get("#input-email").type(user.email);
-  cy.get("#input-password").type(user.password, { log: false });
-  cy.get("input[type='submit'][value='Login']").click();
+  cy.submitValidLogin();
 });
 
 Then("the user should be logged in", function () {
