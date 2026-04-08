@@ -8,9 +8,7 @@ const comparableProducts = [
 
 Given("the user is viewing the Cameras category", function () {
   cy.visitCategoryPage(catalog.categories.cameras);
-  comparableProducts.forEach((productName) => {
-    cy.contains(".product-thumb", productName).should("be.visible");
-  });
+  cy.assertCategoryShowsProducts(comparableProducts);
 });
 
 When("the user adds Canon EOS 5D and Nikon D300 to compare", function () {

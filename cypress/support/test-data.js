@@ -41,8 +41,15 @@ const cartItems = {
   },
 };
 
+const users = {
+  valid: {
+    envKey: "validUser",
+  },
+};
+
 module.exports = {
   cartItems,
   catalog,
   routes,
+  users,
 };

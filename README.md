@@ -25,7 +25,7 @@ Together, they exercise navigation, form input, asynchronous network behavior, U
 
 - Cypress was selected for browser-level E2E coverage, automatic waiting, network interception, and straightforward debugging.
 - Gherkin/Cucumber was used to keep business intent readable while keeping implementation details in step definitions and reusable commands.
-- Custom commands in `cypress/support/commands.js` group reusable behavior by responsibility: auth, navigation, product actions, cart assertions, and comparison actions/assertions.
+- Reusable commands are split by responsibility under `cypress/support/commands/`: auth, navigation, product actions, cart assertions, and comparison actions/assertions.
 - Static demo-site data is centralized in `cypress/support/test-data.js` so product IDs, routes, category paths, and cart configuration are not duplicated across steps.
 - The Add To Cart flow validates the cart add request with `cy.intercept()` before asserting UI state, which gives a stronger signal than relying only on DOM changes.
 - Link normalization is used for demo-site links that point to `http://opencart.abstracta.us:80`, preventing protocol/port redirects from making Cypress wait on unstable page loads.
@@ -44,6 +44,12 @@ cypress/
       compare-products.js
       login.js
   support/
+    commands/
+      auth.js
+      cart.js
+      comparison.js
+      navigation.js
+      product-actions.js
     commands.js
     e2e.js
     test-data.js
@@ -56,10 +62,22 @@ Key responsibilities:
 
 - `*.feature`: business-readable scenarios.
 - `step_definitions/`: declarative glue between Gherkin and Cypress commands.
-- `support/commands.js`: reusable domain actions and assertions.
+- `support/commands.js`: command registry loaded by Cypress.
+- `support/commands/`: reusable domain actions and assertions grouped by responsibility.
 - `support/test-data.js`: centralized routes and stable demo-site data.
 - `support/e2e.js`: global Cypress support configuration.
 - `.github/workflows/cypress.yml`: CI execution on push and pull request.
+
+## Test Data Strategy
+
+The project keeps public, stable demo-site values in `cypress/support/test-data.js`:
+
+- `routes`: application paths used by the flows.
+- `catalog`: category and product metadata used for navigation and comparison.
+- `cartItems`: product configuration used by the Add To Cart flow.
+- `users`: environment variable keys used to read credentials safely.
+
+Credentials are intentionally not stored in source control. Local runs use `cypress.env.json`; CI uses GitHub Actions secrets.
 
 ## Execution
 
@@ -69,7 +87,7 @@ Install dependencies:
 npm install
 ```
 
-Create a local `cypress.env.json` file in the project root. Use `cypress.env.example.json` as a template:
+Create a local `cypress.env.json` file in the project root:
 
 ```json
 {
@@ -110,8 +128,8 @@ For GitHub Actions, configure these repository secrets:
 - The OpenCart site is a public demo environment, so availability, test data, and response times can vary.
 - The login flow assumes the configured test user exists and remains valid in the demo environment.
 - Cypress may show an `allowCypressEnv` warning because the Cucumber preprocessor currently uses `Cypress.env()` internally. The warning does not fail the suite.
-- The support file ignores the external `pagespeed is not defined` application error because it is emitted by the demo site and is not related to the tested behavior.
-- Some demo-site links are normalized before clicking because they include `http://opencart.abstracta.us:80`, while the tests run against the HTTPS base URL.
+- The support file ignores only the external `pagespeed is not defined` application error emitted by the target OpenCart demo site. This is a scoped workaround for the AUT, not a generic production-testing pattern.
+- Some demo-site links are normalized before clicking because this AUT includes `http://opencart.abstracta.us:80` links while the tests run against the HTTPS base URL.
 
 ## Future Improvements
 

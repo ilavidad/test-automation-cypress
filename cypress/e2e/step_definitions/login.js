@@ -10,6 +10,5 @@ When("the user enters valid credentials", function () {
 });
 
 Then("the user should be logged in", function () {
-  cy.url().should("include", "route=account/account");
-  cy.contains("h2", "My Account").should("be.visible");
+  cy.assertUserIsLoggedIn();
 });
