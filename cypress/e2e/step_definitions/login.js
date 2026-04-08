@@ -1,8 +1,7 @@
 const { Given, When, Then } = require("@badeball/cypress-cucumber-preprocessor");
-const { routes } = require("../../support/test-data");
 
 Given("the user is on the login page", function () {
-  cy.visit(routes.account.login);
+  cy.visitLoginPage();
 });
 
 When("the user enters valid credentials", function () {

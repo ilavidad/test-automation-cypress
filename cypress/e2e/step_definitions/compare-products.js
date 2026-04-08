@@ -1,19 +1,16 @@
 const { Given, When, Then } = require("@badeball/cypress-cucumber-preprocessor");
-const { catalog } = require("../../support/test-data");
+const { comparisonSets } = require("../../support/data/comparison.data");
 
-const comparableProducts = [
-  catalog.products.canonEos5d.name,
-  catalog.products.nikonD300.name,
-];
+const comparisonSet = comparisonSets.camerasCanonVsNikon;
 
 Given("the user is viewing the Cameras category", function () {
-  cy.visitCategoryPage(catalog.categories.cameras);
-  cy.assertCategoryShowsProducts(comparableProducts);
+  cy.visitCategoryPage(comparisonSet.category);
+  cy.assertCategoryShowsProducts(comparisonSet.products);
 });
 
 When("the user adds Canon EOS 5D and Nikon D300 to compare", function () {
-  comparableProducts.forEach((productName) => {
-    cy.addProductToCompare(productName);
+  comparisonSet.products.forEach((product) => {
+    cy.addProductToCompare(product.name);
   });
 });
 
@@ -22,5 +19,5 @@ When("the user opens the product comparison", function () {
 });
 
 Then("both products should be displayed in comparison", function () {
-  cy.assertProductComparisonContains(comparableProducts);
+  cy.assertProductComparisonContains(comparisonSet.products);
 });

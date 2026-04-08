@@ -1,4 +1,4 @@
-const { users } = require("../test-data");
+const { users } = require("../data/users.data");
 
 Cypress.Commands.add("submitValidLogin", () => {
   const user = Cypress.env(users.valid.envKey);
@@ -12,9 +12,4 @@ Cypress.Commands.add("submitValidLogin", () => {
   cy.get("#input-email").type(user.email);
   cy.get("#input-password").type(user.password, { log: false });
   cy.get("input[type='submit'][value='Login']").click();
-});
-
-Cypress.Commands.add("assertUserIsLoggedIn", () => {
-  cy.url().should("include", "route=account/account");
-  cy.contains("h2", "My Account").should("be.visible");
 });

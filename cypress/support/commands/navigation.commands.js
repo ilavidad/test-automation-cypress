@@ -1,4 +1,8 @@
-const { routes } = require("../test-data");
+const { routes } = require("../data/routes.data");
+
+Cypress.Commands.add("visitLoginPage", () => {
+  cy.visit(routes.account.login);
+});
 
 Cypress.Commands.add("visitProductPage", (product) => {
   cy.visit(`${routes.product.detail}&product_id=${product.id}`, {

@@ -22,7 +22,7 @@ module.exports = defineConfig({
   e2e: {
     baseUrl: "https://opencart.abstracta.us",
     pageLoadTimeout: 120000,
-    specPattern: "cypress/e2e/**/*.feature",
+    specPattern: "cypress/e2e/features/**/*.feature",
     setupNodeEvents,
   },
 });

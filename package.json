@@ -6,9 +6,9 @@
   "scripts": {
     "test": "cypress run",
     "dev": "cypress open",
-    "test:login": "cypress run --spec cypress/e2e/login.feature",
-    "test:add-to-cart": "cypress run --spec cypress/e2e/add-to-cart.feature",
-    "test:compare": "cypress run --spec cypress/e2e/compare-products.feature"
+    "test:login": "cypress run --spec cypress/e2e/features/login.feature",
+    "test:add-to-cart": "cypress run --spec cypress/e2e/features/add-to-cart.feature",
+    "test:compare": "cypress run --spec cypress/e2e/features/compare-products.feature"
   },
   "keywords": [],
   "author": "Anais Molina",
