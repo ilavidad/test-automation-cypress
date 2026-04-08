@@ -1,10 +1,13 @@
 const { Given, When, Then } = require("@badeball/cypress-cucumber-preprocessor");
-const { categories, products } = require("../../support/test-data");
+const { catalog } = require("../../support/test-data");
 
-const comparableProducts = [products.canonEos5d.name, products.nikonD300.name];
+const comparableProducts = [
+  catalog.products.canonEos5d.name,
+  catalog.products.nikonD300.name,
+];
 
 Given("the user is viewing the Cameras category", function () {
-  cy.visitCategoryPage(categories.cameras);
+  cy.visitCategoryPage(catalog.categories.cameras);
   comparableProducts.forEach((productName) => {
     cy.contains(".product-thumb", productName).should("be.visible");
   });

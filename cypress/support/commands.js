@@ -1,5 +1,6 @@
 const { routes } = require("./test-data");
 
+// Auth
 Cypress.Commands.add("submitValidLogin", () => {
   const user = Cypress.env("validUser");
 
@@ -12,20 +13,22 @@ Cypress.Commands.add("submitValidLogin", () => {
   cy.get("input[type='submit'][value='Login']").click();
 });
 
+// Navigation
 Cypress.Commands.add("visitProductPage", (product) => {
-  cy.visit(`${routes.product}&product_id=${product.id}`, {
+  cy.visit(`${routes.product.detail}&product_id=${product.id}`, {
     timeout: 120000,
   });
   cy.contains("h1", product.name).should("be.visible");
 });
 
 Cypress.Commands.add("visitCategoryPage", (category) => {
-  cy.visit(`${routes.category}&path=${category.path}`, {
+  cy.visit(`${routes.product.category}&path=${category.path}`, {
     timeout: 120000,
   });
   cy.contains("h2", category.name).should("be.visible");
 });
 
+// Product actions
 Cypress.Commands.add("assertProductOptionsAvailable", () => {
   cy.contains("Available Options").should("be.visible");
   cy.get("#product select[id^='input-option']").should("be.visible");
@@ -52,32 +55,34 @@ Cypress.Commands.add("addCurrentProductToCart", () => {
   cy.wait("@addToCart").its("response.body").should("have.property", "success");
 });
 
+// Cart assertions
 Cypress.Commands.add("openCartPageFromDropdown", (expectedQuantity) => {
   cy.get("#cart-total").should("contain", `${expectedQuantity} item`);
   cy.get('#cart button[data-toggle="dropdown"]').click();
   cy.get("#cart .dropdown-menu").should("be.visible");
   cy.get("#cart")
     .contains('a[href*="route=checkout/cart"]', "View Cart")
-    .invoke("attr", "href", routes.cart)
+    .invoke("attr", "href", routes.checkout.cart)
     .click();
 });
 
-Cypress.Commands.add("assertConfiguredProductInCart", (product) => {
+Cypress.Commands.add("assertConfiguredProductInCart", (cartItem) => {
   cy.url().should("include", "route=checkout/cart");
   cy.get(".breadcrumb").should("contain", "Shopping Cart");
   cy.get("#content")
-    .contains("td.text-left a", product.name)
+    .contains("td.text-left a", cartItem.product.name)
     .should("be.visible")
     .parents("tr")
     .within(() => {
-      cy.get("small").should("contain", product.configuration.summary);
+      cy.get("small").should("contain", cartItem.configuration.summary);
       cy.get("input[name^='quantity']").should(
         "have.value",
-        product.configuration.quantity
+        cartItem.configuration.quantity
       );
     });
 });
 
+// Comparison actions/assertions
 Cypress.Commands.add("addProductToCompare", (productName) => {
   cy.contains(".product-thumb", productName)
     .find('button[data-original-title="Compare this Product"]')
@@ -87,7 +92,7 @@ Cypress.Commands.add("addProductToCompare", (productName) => {
 
 Cypress.Commands.add("openProductComparison", () => {
   cy.contains('a[href*="route=product/compare"]', "product comparison")
-    .invoke("attr", "href", routes.compare)
+    .invoke("attr", "href", routes.product.compare)
     .click();
 });
 

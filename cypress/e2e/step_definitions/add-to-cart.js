@@ -1,10 +1,10 @@
 const { Given, When, Then } = require("@badeball/cypress-cucumber-preprocessor");
-const { products } = require("../../support/test-data");
+const { cartItems } = require("../../support/test-data");
 
-const product = products.canonEos5d;
+const cartItem = cartItems.configuredCanonEos5d;
 
 Given("the user is viewing a configurable product", function () {
-  cy.visitProductPage(product);
+  cy.visitProductPage(cartItem.product);
 });
 
 Then("the product options should be available", function () {
@@ -12,11 +12,11 @@ Then("the product options should be available", function () {
 });
 
 When("the user configures the product", function () {
-  cy.configureProduct(product.configuration);
+  cy.configureProduct(cartItem.configuration);
 });
 
 Then("the selected product configuration should be displayed", function () {
-  cy.assertProductConfiguration(product.configuration);
+  cy.assertProductConfiguration(cartItem.configuration);
 });
 
 When("the user adds the product to the cart", function () {
@@ -24,9 +24,9 @@ When("the user adds the product to the cart", function () {
 });
 
 When("the user goes to the cart page", function () {
-  cy.openCartPageFromDropdown(product.configuration.quantity);
+  cy.openCartPageFromDropdown(cartItem.configuration.quantity);
 });
 
 Then("the configured product should be displayed in the cart", function () {
-  cy.assertConfiguredProductInCart(product);
+  cy.assertConfiguredProductInCart(cartItem);
 });

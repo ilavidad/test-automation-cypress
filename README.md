@@ -1,31 +1,35 @@
 # Test Automation Cypress
 
-End-to-end test automation project for the OpenCart demo site using Cypress and Gherkin.
-
 ## Objective
 
-Validate representative user journeys in a public ecommerce demo while keeping the test code readable, maintainable, and easy to extend.
+Build a maintainable Cypress + Cucumber end-to-end automation suite for the OpenCart demo site.
+The goal is to validate representative ecommerce behavior while keeping scenarios readable, reusable, and realistic for a technical QA automation assessment.
 
 ## Selected Flows
 
 - Login: validates that an existing user can sign in successfully.
-- Add To Cart: configures `Canon EOS 5D`, adds it to the cart, and validates the configured product in the cart view.
-- Compare Products: compares `Canon EOS 5D` and `Nikon D300` from the Cameras category.
+- Add To Cart: configures `Canon EOS 5D` with option `Blue` and quantity `4`, adds it to the cart, and validates the configured item in the cart view.
+- Compare Products: adds `Canon EOS 5D` and `Nikon D300` to product comparison from the Cameras category and validates both products in the comparison view.
 
 ## Why These Flows
 
-These scenarios cover core ecommerce behavior without requiring admin access or changing the application under test: authentication, product configuration, cart validation, and product comparison.
+These flows cover important ecommerce risks without requiring admin access or database control:
 
-## Tech Stack
+- Login validates authentication with environment-driven credentials.
+- Add To Cart validates product configuration, AJAX cart submission, cart navigation, and cart detail assertions.
+- Compare Products validates category navigation, repeated product actions, and comparison page assertions.
 
-- Cypress
-- Gherkin / Cucumber
-- @badeball/cypress-cucumber-preprocessor
-- @bahmutov/cypress-esbuild-preprocessor
+Together, they exercise navigation, form input, asynchronous network behavior, UI feedback, and final-state validation.
 
-## Test Site
+## Technical Decisions
 
-Base URL: `https://opencart.abstracta.us`
+- Cypress was selected for browser-level E2E coverage, automatic waiting, network interception, and straightforward debugging.
+- Gherkin/Cucumber was used to keep business intent readable while keeping implementation details in step definitions and reusable commands.
+- Custom commands in `cypress/support/commands.js` group reusable behavior by responsibility: auth, navigation, product actions, cart assertions, and comparison actions/assertions.
+- Static demo-site data is centralized in `cypress/support/test-data.js` so product IDs, routes, category paths, and cart configuration are not duplicated across steps.
+- The Add To Cart flow validates the cart add request with `cy.intercept()` before asserting UI state, which gives a stronger signal than relying only on DOM changes.
+- Link normalization is used for demo-site links that point to `http://opencart.abstracta.us:80`, preventing protocol/port redirects from making Cypress wait on unstable page loads.
+- Page objects were intentionally not introduced yet. The suite is still small, and custom commands provide enough reuse without adding unnecessary layers.
 
 ## Project Structure
 
@@ -43,17 +47,21 @@ cypress/
     commands.js
     e2e.js
     test-data.js
+.github/
+  workflows/
+    cypress.yml
 ```
 
 Key responsibilities:
 
 - `*.feature`: business-readable scenarios.
-- `step_definitions/`: glue between Gherkin steps and Cypress actions.
-- `support/commands.js`: reusable Cypress commands for domain actions.
-- `support/test-data.js`: stable demo-site routes, products, categories, and product configuration data.
+- `step_definitions/`: declarative glue between Gherkin and Cypress commands.
+- `support/commands.js`: reusable domain actions and assertions.
+- `support/test-data.js`: centralized routes and stable demo-site data.
 - `support/e2e.js`: global Cypress support configuration.
+- `.github/workflows/cypress.yml`: CI execution on push and pull request.
 
-## Setup
+## Execution
 
 Install dependencies:
 
@@ -61,7 +69,7 @@ Install dependencies:
 npm install
 ```
 
-Create a `cypress.env.json` file in the project root. Use `cypress.env.example.json` as a template:
+Create a local `cypress.env.json` file in the project root. Use `cypress.env.example.json` as a template:
 
 ```json
 {
@@ -72,39 +80,43 @@ Create a `cypress.env.json` file in the project root. Use `cypress.env.example.j
 }
 ```
 
-`cypress.env.json` is ignored by Git and should not be committed.
-
-## Run Tests
-
-Run all tests in headless mode:
+Run all tests headlessly:
 
 ```bash
-npm.cmd run test
+npm run test
 ```
 
-Open Cypress in interactive mode:
+Open Cypress interactively:
 
 ```bash
-npm.cmd run dev
+npm run dev
 ```
 
 Run a specific flow:
 
 ```bash
-npm.cmd run test:login
-npm.cmd run test:add-to-cart
-npm.cmd run test:compare
+npm run test:login
+npm run test:add-to-cart
+npm run test:compare
 ```
 
-## Notes
+For GitHub Actions, configure these repository secrets:
 
-The OpenCart demo site is public and can be unstable. The suite includes small workarounds for demo-site behavior, such as ignoring the external `pagespeed is not defined` error and normalizing links that point to `http://opencart.abstracta.us:80`.
+- `OPENCART_TEST_EMAIL`
+- `OPENCART_TEST_PASSWORD`
 
-Cypress may show an `allowCypressEnv` warning because the Cucumber preprocessor currently relies on `Cypress.env()` internally. The warning does not fail the tests.
+## Known Issues / Assumptions
+
+- The OpenCart site is a public demo environment, so availability, test data, and response times can vary.
+- The login flow assumes the configured test user exists and remains valid in the demo environment.
+- Cypress may show an `allowCypressEnv` warning because the Cucumber preprocessor currently uses `Cypress.env()` internally. The warning does not fail the suite.
+- The support file ignores the external `pagespeed is not defined` application error because it is emitted by the demo site and is not related to the tested behavior.
+- Some demo-site links are normalized before clicking because they include `http://opencart.abstracta.us:80`, while the tests run against the HTTPS base URL.
 
 ## Future Improvements
 
-- Replace public demo credentials with a controlled test user lifecycle if the environment allows it.
-- Add retry-safe setup or cleanup for cart state if more cart scenarios are added.
-- Add reporting for CI execution.
-- Introduce page objects only if flows grow enough to justify another abstraction layer.
+- Add a controlled user setup strategy if a stable test environment becomes available.
+- Add cleanup or isolated cart/session setup if more cart scenarios are introduced.
+- Add CI artifacts for screenshots/videos on failure.
+- Add reporting, such as JUnit or HTML output, for CI visibility.
+- Introduce page objects only if the suite grows enough to justify another abstraction layer.
