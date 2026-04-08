@@ -9,9 +9,7 @@ async function setupNodeEvents(on, config) {
   on(
     "file:preprocessor",
     createBundler({
-      plugins: [
-        require("@badeball/cypress-cucumber-preprocessor/esbuild").default(config),
-      ],
+      plugins: [require("@badeball/cypress-cucumber-preprocessor/esbuild").default(config)],
     })
   );
 

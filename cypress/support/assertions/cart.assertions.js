@@ -7,9 +7,6 @@ Cypress.Commands.add("assertConfiguredProductInCart", (configuration) => {
     .parents("tr")
     .within(() => {
       cy.get("small").should("contain", configuration.cartSummary);
-      cy.get("input[name^='quantity']").should(
-        "have.value",
-        configuration.quantity
-      );
+      cy.get("input[name^='quantity']").should("have.value", configuration.quantity);
     });
 });

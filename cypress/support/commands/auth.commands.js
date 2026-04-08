@@ -4,9 +4,7 @@ Cypress.Commands.add("submitValidLogin", () => {
   const user = Cypress.env(users.valid.envKey);
 
   if (!user?.email || !user?.password) {
-    throw new Error(
-      `Missing ${users.valid.envKey} credentials in cypress.env.json`
-    );
+    throw new Error(`Missing ${users.valid.envKey} credentials in cypress.env.json`);
   }
 
   cy.get("#input-email").type(user.email);

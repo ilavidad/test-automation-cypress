@@ -42,41 +42,62 @@ Together, these flows exercise UI navigation, form input, async network behavior
 ## Architecture Overview
 
 ```text
-cypress/
-  e2e/
-    features/
-      add-to-cart.feature
-      compare-products.feature
-      login.feature
-    step_definitions/
-      add-to-cart.js
-      compare-products.js
-      login.js
-  support/
-    commands/
-      auth.commands.js
-      cart.commands.js
-      comparison.commands.js
-      navigation.commands.js
-      product.commands.js
-    assertions/
-      auth.assertions.js
-      cart.assertions.js
-      comparison.assertions.js
-      product.assertions.js
-    data/
-      comparison.data.js
-      products.data.js
-      routes.data.js
-      users.data.js
-    utils/
-      demo-site-workarounds.js
-      link-normalization.js
-    commands.js
-    e2e.js
-.github/
-  workflows/
-    cypress.yml
+.
+|-- .cypress-cucumber-preprocessorrc.json
+|-- .github/
+|   `-- workflows/
+|       `-- cypress.yml
+|-- cypress.config.js
+|-- eslint.config.js
+|-- package.json
+|-- package-lock.json
+|-- scripts/
+|   |-- run-cypress.js
+|   `-- validate-env.js
+|-- README.md
+`-- cypress/
+    |-- e2e/
+    |   |-- features/
+    |   |   |-- add-to-cart.feature
+    |   |   |-- compare-products.feature
+    |   |   `-- login.feature
+    |   `-- step_definitions/
+    |       |-- add-to-cart.js
+    |       |-- compare-products.js
+    |       `-- login.js
+    `-- support/
+        |-- assertions/
+        |   |-- auth.assertions.js
+        |   |-- cart.assertions.js
+        |   |-- comparison.assertions.js
+        |   `-- product.assertions.js
+        |-- commands/
+        |   |-- auth.commands.js
+        |   |-- cart.commands.js
+        |   |-- comparison.commands.js
+        |   |-- navigation.commands.js
+        |   `-- product.commands.js
+        |-- data/
+        |   |-- comparison.data.js
+        |   |-- products.data.js
+        |   |-- routes.data.js
+        |   `-- users.data.js
+        |-- utils/
+        |   |-- demo-site-workarounds.js
+        |   `-- link-normalization.js
+        |-- commands.js
+        `-- e2e.js
+```
+
+Ignored local/runtime files:
+
+```text
+cypress.env.json
+cypress/screenshots/
+cypress/videos/
+cypress/downloads/
+cypress/reports/
+node_modules/
 ```
 
 Design flow:
@@ -97,6 +118,7 @@ Public demo-site data is grouped by domain:
 - `users.data.js`: environment variable keys for user credentials.
 
 Credentials are not stored in source control. Local runs use `cypress.env.json`; CI uses GitHub Actions secrets.
+The runner validates required credentials before executing Cypress, so missing config fails early with a clear error instead of failing inside a scenario.
 
 Local `cypress.env.json` example:
 
@@ -109,6 +131,17 @@ Local `cypress.env.json` example:
 }
 ```
 
+Required CI secrets:
+
+- `OPENCART_TEST_EMAIL`
+- `OPENCART_TEST_PASSWORD`
+
+Validate the local/CI credential setup without running Cypress:
+
+```bash
+npm run validate:env
+```
+
 ## Workaround Strategy for Demo AUT
 
 The target application is a public demo site, so the suite contains controlled, AUT-specific mitigations:
@@ -117,6 +150,8 @@ The target application is a public demo site, so the suite contains controlled, 
 - Demo-site links that point to `http://opencart.abstracta.us:80` are normalized through `link-normalization.js` before clicking, avoiding protocol/port redirects that can make Cypress wait on unstable page loads.
 
 These workarounds are intentionally scoped to this AUT and should not be treated as generic exception-handling patterns for production-grade systems.
+
+Local Cypress execution also goes through `scripts/run-cypress.js`, which removes `ELECTRON_RUN_AS_NODE` only for the Cypress child process. This keeps the local Electron workaround isolated from test logic and does not change the test scenarios or framework structure.
 
 ## Execution
 
@@ -146,9 +181,47 @@ npm run test:add-to-cart
 npm run test:compare
 ```
 
+Run quality checks:
+
+```bash
+npm run lint
+npm run format:check
+```
+
+Auto-fix lint and formatting issues:
+
+```bash
+npm run lint:fix
+npm run format
+```
+
+## Test Reports
+
+Cucumber HTML and JSON reports are generated automatically when Cypress runs:
+
+```text
+cypress/reports/cucumber-report.html
+cypress/reports/cucumber-report.json
+```
+
+Generate the report:
+
+```bash
+npm run test
+```
+
+Open the HTML report from the project root:
+
+```powershell
+start cypress\reports\cucumber-report.html
+```
+
+The report folder is ignored by Git and uploaded as a GitHub Actions artifact. Cypress screenshots and videos keep their current behavior and are still uploaded on CI failure when available.
+
 ## CI / Automation Execution
 
 GitHub Actions runs Cypress on `push` and `pull_request` using `.github/workflows/cypress.yml`.
+The pipeline installs dependencies, checks formatting, runs ESLint, validates required credentials, creates `cypress.env.json` from repository secrets, runs Cypress, and uploads the Cucumber report artifact.
 
 Required repository secrets:
 
