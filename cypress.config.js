@@ -1,11 +1,27 @@
 const { defineConfig } = require("cypress");
+const createBundler = require("@bahmutov/cypress-esbuild-preprocessor");
+const addCucumberPreprocessorPlugin =
+  require("@badeball/cypress-cucumber-preprocessor").addCucumberPreprocessorPlugin;
+
+async function setupNodeEvents(on, config) {
+  await addCucumberPreprocessorPlugin(on, config);
+
+  on(
+    "file:preprocessor",
+    createBundler({
+      plugins: [
+        require("@badeball/cypress-cucumber-preprocessor/esbuild").default(config),
+      ],
+    })
+  );
+
+  return config;
+}
 
 module.exports = defineConfig({
-  allowCypressEnv: false,
-
   e2e: {
-    setupNodeEvents(on, config) {
-      // implement node event listeners here
-    },
+    baseUrl: "https://opencart.abstracta.us",
+    specPattern: "cypress/e2e/**/*.feature",
+    setupNodeEvents,
   },
 });
